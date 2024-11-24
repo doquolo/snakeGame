@@ -61,7 +61,7 @@ int main() {
         addNode(snakeStart);
     }
     for (int i = 0; i < 3; i++) {
-        createRandomFood(1, 1, h-2, w-2);
+        createRandomFood(1, 1, h-2, w-2, snake);
     }
 
 

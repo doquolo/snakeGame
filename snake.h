@@ -19,48 +19,48 @@ vector<coord> snake;
 int currentHeading = 0;
 
 // storing points
-int point = 0;
-
+int score = -1;
 
 // used when snake extends its length (by consuming foods on map)
 // the food position will be the new head of the snake
 void addNode(coord point) {
     snake.push_back(point);
-    point++;
+    score++;
 }
 
 // used to move the snake 
 // a new head would be processed by another part of the code, then return to this function to be the new head of the snake.
 // Meanwhile the tail (index 0 in snake vector) would be cut off
-void moveSnake(coord point) {
-    snake.push_back(point);
-    snake.erase(snake.begin());  
+void moveSnake() {
+    if (currentHeading != 0) {
+        coord newHead = snake.back();
+        switch (currentHeading) {
+            case +1:
+                newHead.x++;
+                break;
+            case -1:
+                newHead.x--;
+                break;
+            case +2:
+                newHead.y++;
+                break;
+            case -2:
+                newHead.y--;
+                break;
+            default:
+                break;
+        }
+        snake.push_back(newHead);
+        snake.erase(snake.begin());  
+    }
 }
 
 // process input
 // snake cannot head back into its body, so the condition to changing direction is only when the snake go left/right depending on the current heading.
 void processMovement(int direction) {
-    coord newHead = snake.back();
-    if (abs(direction) != abs(currentHeading) {
+    if (abs(direction) != abs(currentHeading)) {
         currentHeading = direction;
     }
-    switch (currentHeading) {
-        case +1:
-            newHead.x++;
-            break;
-        case -1:
-            newHead.x--;
-            break;
-        case +2:
-            newHead.y++;
-            break;
-        case -2:
-            newHead.y--;
-            break;
-        default:
-            break;
-    }
-    moveSnake(newHead);
 }
 
 // used when user want to check for self colision, that is when the snake hits itself

@@ -1,5 +1,6 @@
 #include <vector>
 #include <math.h>
+#include <iostream>
 using namespace std;
 
 // struct to store x,y coordinate of a single point on screen 
@@ -66,6 +67,7 @@ void processMovement(int direction) {
 // used when user want to check for self colision, that is when the snake hits itself
 // it first cuts of the head and store in a temp variable, then a for loop is used to check whether the head collide with any parts of the snake body.
 // return true if the snake hits itself, otherwise false
+// TODO: some weird shits happened here
 bool checkSelfColision(vector<coord> snake) {
     vector<coord> temp;
     coord head = temp.back();
@@ -78,9 +80,10 @@ bool checkSelfColision(vector<coord> snake) {
 
 // used when the user want to check for if the snake hits the wall
 // return true if the snake hits the wall, otherwise false
-bool checkWallColision(coord screenSize, int borderThickness, vector<coord> snake) {
+bool checkWallColision(int w, int h, vector<coord> snake) {
     coord head = snake.back();
-    if (head.x >= (screenSize.x) || head.x <= (screenSize.x) || head.y >= (screenSize.y) || head.x <= (screenSize.y)) return true;
+    cout << head.x << " " << head.y << endl; 
+    if (head.x >= (h-1) || head.x <= 0 || head.y >= (w-1) || head.y <= 0) return true;
     return false;
 }
 

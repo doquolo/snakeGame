@@ -38,15 +38,13 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 // main loop
 int main() {
 
+    int w = 100, h = 30;
+
     // add starting node
-    coord snakeStart1 = {3, 3}; 
-    addNode(snakeStart1);
-    coord snakeStart2 = {3, 4}; 
-    addNode(snakeStart2);
-    coord snakeStart3 = {3, 5}; 
-    addNode(snakeStart2);
-    coord snakeStart4 = {3, 6}; 
-    addNode(snakeStart2);
+    for (int i = 0; i < 10; i++) {
+        coord snakeStart = {3, 3+i}; 
+        addNode(snakeStart);
+    }
 
     // creating instances for attaching hook
     HINSTANCE hInstance = GetModuleHandle(nullptr);
@@ -69,9 +67,15 @@ int main() {
         
         // draw game
         moveSnake();
-        drawPlayArea(100, 30, snake);
+        if (checkWallColision(w, h, snake)) {
+            break;
+        };
+        drawPlayArea(w, h, snake);
         _sleep(100);
     }
+
+    // system("cls");
+    std::cout << "Game over. Score: " << score << endl;
 
     UnhookWindowsHookEx(hHook);
     return 0;

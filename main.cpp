@@ -1,7 +1,21 @@
 #include <windows.h>
 
+#include <thread>
+#include <chrono>
+typedef std::chrono::high_resolution_clock Clock;
+typedef std::chrono::milliseconds milliseconds;
+int speed = 125;
+
+// struct to store x,y coordinate of a single point on screen 
+// this is here to be used in other dependencies
+struct coord {
+    int x, y;
+};
+
+const int w = 100, h = 30;
 
 #include "snake.h"
+#include "food.h"
 #include "cli.h"
 
 // create hook for keyboard event
@@ -38,13 +52,18 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
 // main loop
 int main() {
 
-    int w = 100, h = 30;
+    // create clock
+    Clock::time_point prevTime = Clock::now();
 
     // add starting node
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 3; i++) {
         coord snakeStart = {3, 3+i}; 
         addNode(snakeStart);
     }
+    for (int i = 0; i < 3; i++) {
+        createRandomFood(1, 1, h-2, w-2);
+    }
+
 
     // creating instances for attaching hook
     HINSTANCE hInstance = GetModuleHandle(nullptr);
@@ -65,18 +84,23 @@ int main() {
             DispatchMessage(&msg);
         }
         
-        // draw game
-        moveSnake();
-        if (checkWallColision(w, h, snake)) {
-            break;
-        };
-        drawPlayArea(w, h, snake);
-        _sleep(100);
+        // update game
+        if (std::chrono::duration_cast<milliseconds>(Clock::now() - prevTime) >= milliseconds((int)speed)) {
+            prevTime = Clock::now();
+            moveSnake();
+            if (checkWallColision(w, h, snake) || checkSelfColision(snake)) {
+                break;
+            };
+            if (checkFoodColision(snake)) {
+                speed *= .98;
+            };
+            drawPlayArea(w, h, snake, foodList);
+        }
     }
 
     // system("cls");
     std::cout << "Game over. Score: " << score << endl;
-
+ 
     UnhookWindowsHookEx(hHook);
     return 0;
 }

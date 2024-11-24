@@ -2,7 +2,7 @@
 
 using namespace std;
 
-void drawPlayArea(int w, int h, vector<coord> snake) {
+void drawPlayArea(int w, int h, vector<coord> snake, vector<coord> foodList) {
     system("cls");
     string playArea = "";
     // draw upper border
@@ -19,6 +19,11 @@ void drawPlayArea(int w, int h, vector<coord> snake) {
                 if (part.x == i && part.y == j) {
                     if (part.x == snake.back().x && part.y == snake.back().y) temp = "O";
                     else temp = "o";
+                };
+            }
+            for (auto part: foodList) {
+                if (part.x == i && part.y == j) {
+                    temp = "0";
                 };
             }
             playArea += temp;

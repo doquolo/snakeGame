@@ -3,11 +3,6 @@
 #include <iostream>
 using namespace std;
 
-// struct to store x,y coordinate of a single point on screen 
-struct coord {
-    int x, y;
-};
-
 // vector to store parts of a snake body
 vector<coord> snake;
 
@@ -32,7 +27,8 @@ void addNode(coord point) {
 // used to move the snake 
 // a new head would be processed by another part of the code, then return to this function to be the new head of the snake.
 // Meanwhile the tail (index 0 in snake vector) would be cut off
-void moveSnake() {
+// if keepTail is true then the tail would be kept, and increase the score by one
+void moveSnake(bool keepTail = false) {
     if (currentHeading != 0) {
         coord newHead = snake.back();
         switch (currentHeading) {
@@ -52,7 +48,8 @@ void moveSnake() {
                 break;
         }
         snake.push_back(newHead);
-        snake.erase(snake.begin());  
+        if (!keepTail) snake.erase(snake.begin());  
+        else score++;
     }
 }
 
@@ -69,8 +66,8 @@ void processMovement(int direction) {
 // return true if the snake hits itself, otherwise false
 // TODO: some weird shits happened here
 bool checkSelfColision(vector<coord> snake) {
-    vector<coord> temp;
-    coord head = temp.back();
+    vector<coord> temp = snake;
+    coord head = {temp.back().x, temp.back().y};
     temp.pop_back();
     for (auto x : temp) {
         if (x.x == head.x && x.y == head.y) return true;
@@ -81,9 +78,8 @@ bool checkSelfColision(vector<coord> snake) {
 // used when the user want to check for if the snake hits the wall
 // return true if the snake hits the wall, otherwise false
 bool checkWallColision(int w, int h, vector<coord> snake) {
-    coord head = snake.back();
-    cout << head.x << " " << head.y << endl; 
-    if (head.x >= (h-1) || head.x <= 0 || head.y >= (w-1) || head.y <= 0) return true;
+    coord head = snake.back(); 
+    if (head.x >= (h-2) || head.x <= 0 || head.y >= (w-1) || head.y <= 0) return true;
     return false;
 }
 

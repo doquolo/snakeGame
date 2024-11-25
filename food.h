@@ -15,7 +15,7 @@ void createRandomFood(int xmin, int ymin, int xmax, int ymax, vector<coord> snak
     foodList.push_back(newFood);
 }
 
-bool checkFoodColision(vector<coord> snake) {
+bool checkFoodColision(int w, int h, vector<coord> snake) {
     coord head = {snake.back().x, snake.back().y};
     for (int i = 0; i < foodList.size(); i++) {
         if (head.x == foodList[i].x && head.y == foodList[i].y) {

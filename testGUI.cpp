@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <strsafe.h>
 #include <string>
 #include <iostream>
 
@@ -8,7 +9,7 @@ struct coord {
 
 const int borderThickness = 10;
 const int diag = 10;
-coord window = {400, 500};
+coord window = {450, 600};
 coord gameCoord = {window.x / diag, window.y / diag};
 
 int speed = 100;
@@ -42,12 +43,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 // wchar_t buffer[512];
                 // wsprintfW(buffer, L"Score: %d", score);
                 // MessageBox(hwnd, (LPCSTR)buffer, (LPCSTR)L"Game over!", NULL);
-                std::cout << "end" << std::endl;
+                DestroyWindow(hwnd);
             };
             if (checkFoodColision(gameCoord.x, gameCoord.y, snake)) {
                 speed *= .98;
             };
             // Draw snake
+            // for debugging
+            // coord temp = snake.back();
+            // std::cout << temp.x << "-" << temp.y << std::endl;
             for (auto x : snake) {
                 drawSnake(hdc, (x.x+2)*10, (x.y+2)*10);
             }
@@ -55,6 +59,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             for (auto x : foodList) {
                 drawSnake(hdc, (x.x+2)*10, (x.y+2)*10);
             }
+            // // Draw score text
+            // LPRECT textBox = {0, 0, 12, 30};
+            // char buffer[512];
+            // StringCbPrintfA(buffer, sizeof(buffer), "Score: %d", (int)score);
+            // DrawText(hdc, buffer, sizeof(buffer), textBox, DT_CENTER);
             // ENDPAINT
             EndPaint(hwnd, &ps);
             return 0;
@@ -62,7 +71,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         case WM_KEYDOWN: {
             // Move rectangle on arrow key presses
             switch (wParam) {
-                std::cout << wParam << std::endl;
+                // std::cout << wParam << std::endl;
                 case VK_UP:
                     processMovement(-2);
                     break;
@@ -85,6 +94,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             return 0;
         }
         case WM_DESTROY:
+            char buffer[512];
+            StringCbPrintfA(buffer, sizeof(buffer), "Score: %d", (int)score);
+            int res = MessageBoxA(hwnd, (LPCSTR)buffer, (LPCSTR)"Game over!", MB_OK | MB_TASKMODAL);
             PostQuitMessage(0);
             return 0;
     }

@@ -15,13 +15,12 @@ vector<coord> snake;
 int currentHeading = 0;
 
 // storing points
-int score = -1;
+int score = 0;
 
 // used when snake extends its length (by consuming foods on map)
 // the food position will be the new head of the snake
 void addNode(coord point) {
     snake.push_back(point);
-    score++;
 }
 
 // used to move the snake 
@@ -78,8 +77,8 @@ bool checkSelfColision(vector<coord> snake) {
 // used when the user want to check for if the snake hits the wall
 // return true if the snake hits the wall, otherwise false
 bool checkWallColision(int w, int h, vector<coord> snake) {
-    coord head = snake.back(); 
-    if (head.x >= (h-2) || head.x <= 0 || head.y >= (w-1) || head.y <= 0) return true;
+    coord head = snake.back();
+    if (head.x >= (h-2) || head.x <= -2 || head.y >= (w-2) || head.y <= -2) return true;
     return false;
 }
 

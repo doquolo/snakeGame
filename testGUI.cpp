@@ -12,15 +12,39 @@ const int diag = 10;
 coord window = {450, 600};
 coord gameCoord = {window.x / diag, window.y / diag};
 
-int speed = 100;
+int speed = 125;
 
 #include "snake.h"
 #include "food.h"
 #include "cli.h"
 
-void drawSnake(HDC hdc, int x, int y) {
+
+// brushes
+HBRUSH greenBrush = CreateSolidBrush(RGB(52, 235, 52));
+HBRUSH redBrush = CreateSolidBrush(RGB(235, 52, 52));
+HBRUSH orangeBrush = CreateSolidBrush(RGB(235, 159, 52));
+
+void drawParts(HDC hdc, int x, int y, int selector) {
     RECT snakePart = {x, y, x+diag, y+diag};
-    FillRect(hdc, &snakePart, (HBRUSH)GetStockObject(BLACK_BRUSH));
+    HBRUSH hb;
+    switch (selector) {
+        case 0: // snake body
+        {
+            FillRect(hdc, &snakePart, greenBrush);
+            break;
+        }
+        case 1: // snake head
+        {
+            FillRect(hdc, &snakePart, redBrush);
+            break;
+        }
+        case 2: // snake head
+        {
+            FillRect(hdc, &snakePart, orangeBrush);
+            break;
+        }
+        default: break;
+    }
 }
 
 // Window Procedure
@@ -39,31 +63,29 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             // Process game logic
             moveSnake();
             if (checkWallColision(gameCoord.x, gameCoord.y, snake) || checkSelfColision(snake)) {
-                // TODO: pausing game
-                // wchar_t buffer[512];
-                // wsprintfW(buffer, L"Score: %d", score);
-                // MessageBox(hwnd, (LPCSTR)buffer, (LPCSTR)L"Game over!", NULL);
                 DestroyWindow(hwnd);
             };
             if (checkFoodColision(gameCoord.x, gameCoord.y, snake)) {
                 speed *= .98;
+                // reset timer
+                SetTimer(hwnd, 1, speed, NULL); // Timer ID = 1
             };
             // Draw snake
             // for debugging
             // coord temp = snake.back();
             // std::cout << temp.x << "-" << temp.y << std::endl;
-            for (auto x : snake) {
-                drawSnake(hdc, (x.x+2)*10, (x.y+2)*10);
+            for (int i = 0; i < snake.size(); i++) {
+                coord temp = snake[i];
+                drawParts(hdc, (temp.x+2)*10, (temp.y+2)*10, (i == int(snake.size()) - 1) ? 1 : 0);
             }
             // Draw food
             for (auto x : foodList) {
-                drawSnake(hdc, (x.x+2)*10, (x.y+2)*10);
+                drawParts(hdc, (x.x+2)*10, (x.y+2)*10, 2);
             }
             // // Draw score text
-            // LPRECT textBox = {0, 0, 12, 30};
-            // char buffer[512];
-            // StringCbPrintfA(buffer, sizeof(buffer), "Score: %d", (int)score);
-            // DrawText(hdc, buffer, sizeof(buffer), textBox, DT_CENTER);
+            char buffer[512];
+            StringCbPrintfA(buffer, sizeof(buffer), "Score: %d", (int)score);
+            TextOutA(hdc, 20, 15, buffer, strlen(buffer));
             // ENDPAINT
             EndPaint(hwnd, &ps);
             return 0;
@@ -106,7 +128,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 // Entry Point
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 
-    const char CLASS_NAME[] = "DynamicRectangleWindow";
+    const char CLASS_NAME[] = "SoNekGame";
 
     WNDCLASS wc = { };
     wc.lpfnWndProc = WindowProc; // Set the window procedure
@@ -120,7 +142,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     HWND hwnd = CreateWindowEx(
         0,                              // Optional window styles
         CLASS_NAME,                     // Window class
-        "Dynamic Rectangle Example",    // Window text
+        "SnakeGame",    // Window text
         WS_OVERLAPPEDWINDOW,            // Window style
         CW_USEDEFAULT, CW_USEDEFAULT,   // Position
         window.y+16, window.x+38,             // Size
@@ -139,24 +161,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // Prepare game
     // add starting node
     for (int i = 0; i < 3; i++) {
-        coord snakeStart = {(int)gameCoord.x/2, (int)(gameCoord.y/2)+i}; 
+        coord snakeStart = {((int)((gameCoord.y-2))/2)+i, ((int)((gameCoord.x-2))/2)};  
         addNode(snakeStart);
     }
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         createRandomFood(1, 1, gameCoord.x-2, gameCoord.y-2, snake);
     }
 
-    // DEBUG game init
-    for (auto x : snake) {
-        std::cout << x.x << "-" << x.y << std::endl;
-    }
-    for (auto x : foodList) {
-        std::cout << x.x << "_" << x.y << std::endl;
-    }
+    // // DEBUG game init
+    // for (auto x : snake) {
+    //     std::cout << x.x << "-" << x.y << std::endl;
+    // }
+    // for (auto x : foodList) {
+    //     std::cout << x.x << "_" << x.y << std::endl;
+    // }
     
 
     // Set a timer to update the rectangle position periodically
-    SetTimer(hwnd, 1, speed, NULL); // Timer ID = 1, Interval = 100ms
+    SetTimer(hwnd, 1, speed, NULL); // Timer ID = 1
 
     // Run the message loop
     MSG msg = { };

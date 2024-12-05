@@ -44,7 +44,6 @@ void drawParts(int x, int y) {
 }
 
 void setup() {
-
   // begin serial for debug
   Serial.begin(115200);
 
@@ -94,11 +93,21 @@ void loop() {
       // Process game logic
       moveSnake();
       if (checkWallColision(gameCoord.x, gameCoord.y, snake) || checkSelfColision(snake)) {
+          u8g2.clearDisplay();
+          u8g2.setFont(u8g2_font_7x13B_tr);
+          u8g2.drawStr(30,30,"Game Over!");
+          u8g2.setFont(u8g2_font_t0_11_tr);
+          char bufferDiem[128];
+          sprintf(bufferDiem, "Score: %d", score);
+          u8g2.drawStr(30, 40, bufferDiem);
+
+          u8g2.sendBuffer();
           while (true) {
-            digitalWrite(PC13, HIGH);
-            delay(500);
-            digitalWrite(PC13, LOW);
-            delay(500);
+            btnsel.loop();
+            if (btnsel.isPressed()) {
+              HAL_NVIC_SystemReset();
+            }
+            delay(250);
           }
       };
       if (checkFoodColision(gameCoord.x, gameCoord.y, snake)) {

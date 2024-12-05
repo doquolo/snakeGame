@@ -28,7 +28,7 @@ ezButton btnsel(PB4);
 
 // updates and intervals
 uint64_t prevUpdateTime = 0;
-uint16_t updateTime = 500;
+uint16_t updateTime = 200;
 
 // drawing
 void drawFrame() { 
@@ -45,7 +45,10 @@ void drawParts(int x, int y) {
 
 void setup() {
 
+  // begin serial for debug
   Serial.begin(115200);
+
+  pinMode(PC13, OUTPUT);
 
   // init and set brightness
   pinMode(screenLight, OUTPUT);
@@ -91,11 +94,16 @@ void loop() {
       // Process game logic
       moveSnake();
       if (checkWallColision(gameCoord.x, gameCoord.y, snake) || checkSelfColision(snake)) {
-          Serial.println("collide");
+          while (true) {
+            digitalWrite(PC13, HIGH);
+            delay(500);
+            digitalWrite(PC13, LOW);
+            delay(500);
+          }
       };
       if (checkFoodColision(gameCoord.x, gameCoord.y, snake)) {
           // increase speed
-          updateTime = (int)((float)updateTime * .98);
+          updateTime = (int)((float)updateTime * .85);
       };
       // draw game
       drawFrame();

@@ -89,7 +89,7 @@ bool checkSelfColision(vector<coord> snake) {
 // return true if the snake hits the wall, otherwise false
 bool checkWallColision(int w, int h, vector<coord> snake) {
     coord head = snake.back();
-    if (head.x >= (h-2) || head.x <= -2 || head.y >= (w-2) || head.y <= -2) return true;
+    if (head.x >= (h+2) || head.x <= -1 || head.y >= (w+1) || head.y <= -1) return true;
     return false;
 }
 
